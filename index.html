@@ -464,65 +464,72 @@ PHANTOMFORGE © FUTURE OF EDITING
 
 async function generateCaption(){
 
-  const prompt =
-  document.getElementById("promptInput").value;
+const prompt =
+document.getElementById("promptInput").value;
 
-  const output =
-  document.getElementById("output");
+const output =
+document.getElementById("output");
 
-  output.innerHTML =
-  "Forging response...";
+if(!prompt){
 
-  try{
+output.innerHTML =
+"Enter a prompt first";
 
-   const response = await fetch(
-"https://corsproxy.io/?https://api-inference.huggingface.co/models/gpt2",
+return;
+
+}
+
+output.innerHTML =
+"Forging response...";
+
+try{
+
+const response =
+await fetch(
+"https://phantomforge-ai.onrender.com/generate",
 {
 method:"POST",
 
 headers:{
-Authorization:
-`Bearer ${process.env.HF_TOKEN}`
-"Content-Type":
-"application/json"
+"Content-Type":"application/json"
 },
 
 body:JSON.stringify({
-inputs: prompt
+prompt:prompt
 })
 
 });
 
-    const data =
-    await response.json();
+const data =
+await response.json();
 
-    console.log(data);
+console.log(data);
 
-    if(data.error){
+if(data.error){
 
-      output.innerHTML =
-      "API Error: " + data.error;
+output.innerHTML =
+"AI Error: " + data.error;
 
-    }else if(Array.isArray(data)){
+}else if(Array.isArray(data)){
 
-      output.innerHTML =
-      data[0].generated_text;
+output.innerHTML =
+data[0].generated_text;
 
-    }else{
+}else{
 
-      output.innerHTML =
-      JSON.stringify(data);
+output.innerHTML =
+JSON.stringify(data);
 
-    }
+}
 
-  }catch(err){
+}catch(err){
 
-    output.innerHTML =
-    "Crash: " + err.message;
+output.innerHTML =
+"Connection Failed";
 
-    console.log(err);
+console.log(err);
 
-  }
+}
 
 }
 
