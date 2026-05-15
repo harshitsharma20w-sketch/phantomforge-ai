@@ -21,62 +21,96 @@ app.get("/", (req, res) => {
 
 // AI route
 app.post("/generate", async (req, res) => {
+
   try {
+
     const prompt = req.body.prompt;
 
     if (!prompt) {
-      return res.json({ result: "No prompt provided" });
+      return res.json({
+        result: "No prompt provided"
+      });
     }
 
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
+      "https://api-inference.huggingface.co/models/google/flan-t5-small",
       {
         method: "POST",
+
         headers: {
           Authorization: `Bearer ${process.env.HF_TOKEN}`,
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
-          inputs: `User: ${prompt}\nAssistant:`
+          inputs: prompt
         })
+
       }
     );
 
     const text = await response.text();
 
     let data;
+
     try {
+
       data = JSON.parse(text);
+
     } catch (e) {
+
       return res.json({
         result: text
       });
+
     }
 
     let result = "";
 
     if (Array.isArray(data)) {
-      result = data[0]?.generated_text || "No output generated";
+
+      result =
+        data[0]?.generated_text ||
+        "No output generated";
+
     } else if (data?.generated_text) {
-      result = data.generated_text;
+
+      result =
+        data.generated_text;
+
     } else if (data?.error) {
-      result = "AI Error: " + data.error;
+
+      result =
+        "AI Error: " + data.error;
+
     } else {
-      result = JSON.stringify(data);
+
+      result =
+        JSON.stringify(data);
+
     }
 
-    res.json({ result });
+    res.json({
+      result
+    });
 
   } catch (err) {
+
     res.json({
-      result: "Server error: " + err.message
+      result:
+      "Server error: " + err.message
     });
+
   }
+
 });
 
 // Render port
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("PHANTOMFORGE running on port", PORT);
+  console.log(
+    "PHANTOMFORGE running on port",
+    PORT
+  );
 });
